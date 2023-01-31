@@ -1,0 +1,25 @@
+key words
+"amount": 0,
+"asset-id": 
+    31566704 = USDC
+    287867876 = OPUL
+    388592191 = CHIPS
+    403499324 = GP
+    470842789 = BANK
+    470842789 = DEFLY
+    841126810 = STBL2
+
+Use:
+/v2/assets to get all assets
+    find ASA ID, create int ASA Name, create int ASA Token Name
+    
+/v2/assets/{asset-id}
+
+/v2/accounts/{account-id}/transactions
+    Find account ID transactions using the ASA values as conditionals
+    Path	account-ID
+    Query:	tx-type
+    Query:	asset-id
+    Query:	after-time
+    Query:	before-time
+        optional - Include results before the given time. Must be an RFC 3339
