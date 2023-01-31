@@ -61,41 +61,39 @@ if response.status_code == 200:
     for asset_id in asset_ids:
         # API endpoint for ASA transaction information
         api_endpoint = "https://algoindexer.algoexplorerapi.io/v2/accounts/" + algo_address + "/transactions"
-
+    
         # Make the API request
         response_3 = requests.get(api_endpoint)
-
+        
         # Check if the API request was successful
         if response_3.status_code == 200:
             # Get the ASA information from the response
             asa_transaction_information = response_3.json()
-
+            
             # Get the 'name' and 'unit-name'
-            asa_transactions = asa_transaction_information.get("transactions", [])
-            for transaction in asa_transactions:
-                asset_transfer_transaction = transaction.get("asset-transfer-transaction", {})
-                transaction_type = asset_transfer_transaction.get("tx-type", "")
-                sender_address = asset_transfer_transaction.get("sender", "")
-                receiver_address = asset_transfer_transaction.get("receiver", "")
-                asset_id = asset_transfer_transaction.get("asset-id", "")
-
-                if transaction_type:
-                    transaction_types.append(transaction_type)
-
-                if sender_address:
-                    sender_addresses.append(sender_address)
-
-                if receiver_address:
-                    receiver_addresses.append(receiver_address)
-
-                if asset_id:
-                    asset_ids.append(asset_id)
-
+            asa_transactions = asa_transaction_information.get("transactions", [])[0].get("asset-transfer-transaction", {})
+            transaction_type = asa_transactions.get("tx-type", "")
+            #transaction_amount = asa_transaction_information("amount", "")
+            sender_address = asa_transactions.get("sender", "")
+            receiver_address = asa_transactions.get("receiver", "")
+            
+            if transaction_type:
+                transaction_types.append(transaction_type)
+                
+            if sender_address:
+                sender_addresses.append(sender_address)
+                
+            #if transaction_amount:
+                #transaction_amounts.append(transaction_amount)
+                
+            if receiver_address:
+                receiver_addresses.append(receiver_address)
+            
             print("Transaction Type:", transaction_types)
+           #print("Transaction Amount:", transaction_amount)
             print("Sender Address:", sender_address)
             print("Receiver Address:", receiver_address)
             print("Asset ID:", asset_id, " - ", asa_names)
-
 
             
             #if asset_id in asa_transactions:
