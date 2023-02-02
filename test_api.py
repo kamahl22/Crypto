@@ -1,7 +1,18 @@
 import requests
+import json
+import datetime
 
 # Your Algorand address
-algo_address = "H7OMXZEU45Y5UNMPR4EF7ETXZP3X6WAXDAE76OJGZY7BJYFJ4JIJ4M2KPM"
+algo_address = "XYYL3VGJPCH2AEWOHQQBOPTCS2VO2JIMELFYM7QOW2LFV2VRF6425JKRYA"
+
+# Convert "current-round", "from-round" and "to-round" dates to Algorand rounds
+current_date = datetime.datetime.now()
+current_round = int(current_date.timestamp() * 1000 / 100)
+from_round = int(current_date.timestamp() * 1000 / 100)
+start_date = datetime.datetime(2022, 1, 1)
+end_date = datetime.datetime(2022, 12, 31)
+from_round = int(start_date.timestamp() * 1000 / 100)
+to_round = int(end_date.timestamp() * 1000 / 100)
 
 # API endpoint for getting wallet information
 api_endpoint = "https://algoindexer.algoexplorerapi.io/v2/accounts/" + algo_address
@@ -54,13 +65,13 @@ if response.status_code == 200:
     print("ASA Unit Names:", asa_unit_names)
      
 
-    transaction_types = []
-    sender_addresses = []
-    receiver_addresses = []
+    transaction_type = []
+    sender_address = []
+    receiver_address = []
     #transaction_amounts = []
     for asset_id in asset_ids:
         # API endpoint for ASA transaction information
-        api_endpoint = "https://algoindexer.algoexplorerapi.io/v2/accounts/" + algo_address + "/transactions"
+        api_endpoint = "https://algoindexer.algoexplorerapi.io/v2/accounts/" + algo_address + "/transactions?from-round=1234567&to-round=9876543"
     
         # Make the API request
         response_3 = requests.get(api_endpoint)
@@ -70,43 +81,53 @@ if response.status_code == 200:
             # Get the ASA information from the response
             asa_transaction_information = response_3.json()
             
-            # Get the 'name' and 'unit-name'
-            asa_transactions = asa_transaction_information.get("transactions", [])[0].get("asset-transfer-transaction", {})
-            transaction_type = asa_transactions.get("tx-type", "")
-            #transaction_amount = asa_transaction_information("amount", "")
-            sender_address = asa_transactions.get("sender", "")
-            receiver_address = asa_transactions.get("receiver", "")
-            
-            if transaction_type:
-                transaction_types.append(transaction_type)
-                
-            if sender_address:
-                sender_addresses.append(sender_address)
-                
-            #if transaction_amount:
-                #transaction_amounts.append(transaction_amount)
-                
-            if receiver_address:
-                receiver_addresses.append(receiver_address)
-            
-            print("Transaction Type:", transaction_types)
-           #print("Transaction Amount:", transaction_amount)
-            print("Sender Address:", sender_address)
-            print("Receiver Address:", receiver_address)
-            print("Asset ID:", asset_id, " - ", asa_names)
+            current_round = asa_transaction_information.get("current-round", None)
+            timestamp = current_round * 100 / 1000
+            timestamp = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
-            
-            #if asset_id in asa_transactions:
-              #  asset_id.append(asset_id, )
-            #print(asa_transactions)
-            
-            #tx-type in transactions
+            # Add the timestamp to each transaction
+            next_token = asa_transaction_information.get("next-token", None)
+            transactions = asa_transaction_information.get("transactions", {})
+            #print(transactions)
+            for transaction in transactions:
+                asset_transfer_transaction = transaction.get("asset-transfer-transaction", {})
+                #print(asset_transfer_transaction)
+                tx_type = transaction.get("tx-type", "")
+                sender = transaction.get("sender", "")
+                receiver = asset_transfer_transaction.get("receiver", "")
+                amount = asset_transfer_transaction.get("amount", 0)
+                id = transaction.get("id", "")
+                transaction_asset_id = asset_transfer_transaction.get("asset-id", None)
+                if transaction_asset_id in asset_ids:
+                    index = asset_ids.index(transaction_asset_id)
+                    #asa_name = asa_names[index]
+                    #asa_unit_name = asa_unit_names[index]
+                    current_timestamp = datetime.time()
+                    current_datetime = datetime.datetime.now()
+                    current_date_formatted = current_datetime.strftime("%d-%m-%Y")
+                    
+                    #if start_date <= current_datetime <= end_date:
+                    print("Transaction Date:", current_date_formatted)
+                    print("Asset IDs:", transaction_asset_id)
+                    print("ASA Name:", asa_name)
+                    print("ASA Unit Name:", asa_unit_name)
+                    
+                    from_timestamp = from_round * 100 / 1000
+                    from_datetime = datetime.datetime.fromtimestamp(from_timestamp)
+                    from_date_formatted = from_datetime.strftime("%d-%m-%Y")
 
-               
+                    to_timestamp = to_round * 100 / 1000
+                    to_datetime = datetime.datetime.fromtimestamp(to_timestamp)
+                    to_date_formatted = to_datetime.strftime("%d-%m-%Y")
 
-
-
-
+                    print("From date:", from_date_formatted)
+                    print("To date:", to_date_formatted)
+                    print("Transaction Type:", tx_type)
+                    print("Sender:", sender)
+                    print("Receiver:", receiver)
+                    print("Amount:", amount)
+                    print("ID:", id)
+                    print() 
 else:
     # Print the error message
     print("Failed to retrieve Account Information:", response.json()["message"])
